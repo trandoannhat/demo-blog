@@ -55,6 +55,7 @@ jobs:
             echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
             npm install --production
             npx prisma generate
+            # Khởi động lại với biến môi trường PORT=3003
             pm2 delete demo-be || true
-            pm2 start dist/index.js --name "demo-be"
+            PORT=3003 pm2 start dist/index.js --name "demo-be"
             sudo systemctl restart nginx

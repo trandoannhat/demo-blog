@@ -63,5 +63,5 @@ app.put("/api/posts/:id", async (req, res) => {
 });
 
 // --- DÒNG NÀY PHẢI Ở CUỐI CÙNG ---
-const PORT = process.env.PORT || 3002; // Nhớ đổi thành 3002 như bạn đã cấu hình .env
+const PORT = process.env.PORT || 3003; // Nhớ đổi thành 3002 như bạn đã cấu hình .env
 app.listen(PORT, () => console.log(`BE chạy tại port ${PORT}`));
