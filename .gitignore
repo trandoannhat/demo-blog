@@ -1,0 +1,29 @@
+# Dependency directories
+node_modules/
+fe/node_modules/
+be/node_modules/
+
+# Build outputs
+dist/
+fe/dist/
+be/dist/
+
+# Environment variables (Cực kỳ quan trọng để bảo mật)
+.env
+.env.local
+fe/.env
+fe/.env.local
+be/.env
+
+# Prisma
+be/prisma/dev.db
+be/prisma/dev.db-journal
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS metadata
+.DS_Store
+Thumbs.db
