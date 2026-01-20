@@ -7,7 +7,14 @@ const prisma = new PrismaClient();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://admin-demo.nhatdev.top"],
+    origin: [
+      "http://localhost:5173", // Local dev (Vite)
+      "http://localhost:3000", // Local dev (nếu dùng port khác)
+      "http://admin-demo.nhatdev.top", // Domain cũ (http)
+      "https://admin-demo.nhatdev.top", // Domain mới có SSL (https) - QUAN TRỌNG
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true, // Cho phép gửi cookie/header nếu cần
   }),
 );
 app.use(express.json());
