@@ -2,13 +2,14 @@ name: Deploy Demo Blog
 
 on:
   push:
-    branches: [master] # Kích hoạt khi push vào nhánh master
+    branches: [master]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -50,19 +51,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            # Vào thư mục Backend
             cd /var/www/demo/be
-
-            # Tạo file .env cho Backend trên VPS
             echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
-
-            # Cài đặt thư viện production và cập nhật Prisma
             npm install --production
             npx prisma generate
-
-            # Dùng PM2 để quản lý và chạy Backend
             pm2 delete demo-be || true
             pm2 start dist/index.js --name "demo-be"
-
-            # Restart Nginx để cập nhật giao diện mới
             sudo systemctl restart nginx
