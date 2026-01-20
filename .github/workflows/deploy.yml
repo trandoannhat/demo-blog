@@ -1,0 +1,68 @@
+name: Deploy Demo Blog
+
+on:
+  push:
+    branches: [master] # Kích hoạt khi push vào nhánh master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      # 1. Build Frontend
+      - name: Build Frontend
+        run: |
+          cd fe
+          echo "VITE_API_URL=http://api-demo.nhatdev.top" > .env.production
+          npm install
+          npm run build
+
+      # 2. Build Backend
+      - name: Build Backend
+        run: |
+          cd be
+          npm install
+          npm run build
+
+      # 3. Đẩy code lên VPS qua Port 24700
+      - name: Deploy to VPS
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          REMOTE_PORT: ${{ secrets.PORT }}
+          TARGET: /var/www/demo
+          EXCLUDE: "/node_modules/, /be/prisma/dev.db"
+
+      # 4. Cài đặt và Khởi động lại dịch vụ trên VPS
+      - name: Restart Services
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            # Vào thư mục Backend
+            cd /var/www/demo/be
+
+            # Tạo file .env cho Backend trên VPS
+            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+
+            # Cài đặt thư viện production và cập nhật Prisma
+            npm install --production
+            npx prisma generate
+
+            # Dùng PM2 để quản lý và chạy Backend
+            pm2 delete demo-be || true
+            pm2 start dist/index.js --name "demo-be"
+
+            # Restart Nginx để cập nhật giao diện mới
+            sudo systemctl restart nginx
