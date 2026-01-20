@@ -20,7 +20,7 @@ jobs:
       - name: Build Frontend
         run: |
           cd fe
-          echo "VITE_API_URL=http://api-demo.nhatdev.top" > .env.production
+          echo "VITE_API_URL=https://api-demo.nhatdev.top" > .env.production
           npm install
           npm run build
 
